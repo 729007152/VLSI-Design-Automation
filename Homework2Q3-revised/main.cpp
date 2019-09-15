@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <stdlib.h>
 
 using namespace std;
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,20 +38,36 @@ int main()
     // main variable initialization and declaration
     float x1 = INITIALX1;   // current iteration variable for x1. Set to our initial x1 value for the first iteration.
     float x2 = INITIALX2;   // current iteration variable for x2. Set to our initial x2 value for the first iteration.
+    float x1Next = 1;
+    float x2Next = 1;
     float result;
 
     cout << "The objective function to be solved using 'The Steepest Decent Method' is:\n f(x1,x2) = x1(x1 - 13) + x2^2 + x1(x2 + 7)" << endl;
 
 
     // 1. Search for the minimum in the x1 and x2 direction
-    x1 = linesearchx1(INITIALX1, INITIALX2);
-    x2 = linesearchx2(INITIALX1, INITIALX2);
+    int iterate=1;
+    while((abs(x1-x1Next)>(e/10)) || (abs(x2-x2Next)>(e/10))){
+        cout << "\n\n///////////////////////////////////////////////////////////////////////////////////////////////" << endl;
+        cout << "//////////////////////////////////Steepest Decent Algorithm///////////////////////////////////" << endl;
+        cout << "//////////////////////////////////Iteration " << iterate << "/////////////////////////////////////////////////" << endl;
+        cout << "///////////////////////////////////////////////////////////////////////////////////////////////" << endl;
+        x1Next = linesearchx1(x1, x2);
+        x2Next = linesearchx2(x1, x2);
+        x1 = linesearchx1(x1Next, x2Next);
+        x2 = linesearchx2(x1Next, x2Next);
+        cout << "x1: " << x1 << endl;
+        cout << "x2: " << x2 << endl;
+        iterate++;
+    }
+
+
 
     // 2. Calculate function value minimum (x1, x2) value
     result = calc_function(x1, x2);
     cout << "\n\nThe minimum value of the function yields a: " << result << endl;
     cout << "Minimum x1 value: " << x1 << endl;
-    cout << "Minimum x2 value: \n\n" << x2 << endl;
+    cout << "Minimum x2 value: " << x2 << endl;
 
 
 
@@ -101,7 +118,7 @@ int main()
     cout << "\n\n\t\tInitiated a line search in the x1 direction\n";
     cout << "Initial step size is "<< lam << endl;
     while (abs(dfdx1(x1, x2)) > e){     // Check if we are within our tolerance.
-        cout << "\t==================== Iteration " << iteration << " ====================" << endl;
+        cout << "\t==================== Linesearch x1 Iteration " << iteration << " ====================" << endl;
         cout << "The partial derivative of f(x1, x2) with respect to x1 at (" << x1 <<", " << x2 <<") is: " << dfdx1(x1, x2) << endl;
 
         // Check if we passed the minimum and if our initial point is passed the minimum
@@ -114,7 +131,11 @@ int main()
             }
 
         // This else is the condition that we did not pass the minimum.
-        else
+        else{
+            if(-dfdx2(x1, x2 + lam) == 0){
+                lam = lam + x2;
+                x2 = lam;
+            }
             if(-dfdx1(x1 + lam, x2)> -dfdx2(x1, x2)){ // Checks the case that we are stepping in the wrong direction.
                 lam = -lam;
                 cout << "Wrong way. Lam: " << lam << " x1: " << x1 << endl;
@@ -123,6 +144,7 @@ int main()
                     x1 = lam;
                     cout << "Closer to the min. Lam: " << lam << " x1: " << x1 << endl;
             }
+        }
         iteration ++;
     }
     cout << "dfdx1 is less than our tolerance at our current point. The final x1 value is " << x1 << endl;
@@ -147,28 +169,43 @@ int main()
     cout << "Initial step size is "<< lam << endl;
 
     while (abs(dfdx2(x1, x2)) > e){
-        cout << "\t==================== Iteration " << iteration << " ====================" << endl;
-        cout << "The partial derivative of f(x1, x2) with respect to x1 at (" << x1 <<", " << x2 <<") is: " << dfdx2(x1, x2) << endl;
+        cout << "\t==================== Linesearch x2 iteration " << iteration << " ====================" << endl;
+        //cout << "The partial derivative of f(x1, x2) with respect to x1 at (" << x1 <<", " << x2 <<") is: " << dfdx2(x1, x2) << endl;
 
         // Check if we passed the minimum and if our initial point is passed the minimum
         if(-dfdx2(x1, x2 + lam) < 0)
             if(-dfdx2(x1, x2 + lam/2) < 0){ // Checks if we are too far passed the minimum and if our initial point is passed the minimum.
-                lam = lam - (2*lam);
+                lam = lam - abs(lam)*2;
                 cout << "Initial point is passed the minimum. Lam: " << lam << " x2: " << x2 << endl;
+                cout << "The partial derivative of f(x1, x2) with respect to x1 at (" << x1 <<", " << x2+lam <<") is: " << dfdx2(x1, x2+lam) << endl;
             } else { // If we are just pass the min then take a half step back.
                 lam = lam/2;
             }
 
         // This else is the condition that we did not pass the minimum.
-        else
+        else{/*
             if(-dfdx2(x1, x2 + lam)> -dfdx2(x1, x2)){ // Checks if we are stepping in the wrong direction.
-                lam = -lam;
+                lam = -abs(lam)+.5;
                 cout << "Wrong way. Lam: " << lam << " x2: " << x2 << endl;
+                cout << "The partial derivative of f(x1, x2) with respect to x1 at (" << x1 <<", " << x2+lam <<") is: " << dfdx2(x1, x2+lam) << endl;
             } else { // This is the case where we are closer to the minimum but did not pass it.
                     lam = lam + x2;
                     x2 = lam;
                     cout << "Closer to the min. Lam: " << lam << " x2: " << x2 << endl;
+            }*/
+            if(-dfdx2(x1, x2 + lam) == 0){
+                lam = lam + x2;
+                x2 = lam;
             }
+            if(-dfdx2(x1, x2 + lam)> -dfdx2(x1, x2)){ // Checks if we are stepping in the wrong direction.
+                lam = -abs(lam)+abs(lam)*.5;
+                cout << "Wrong way. Lam: " << lam << " x2: " << x2 << endl;
+                cout << "The partial derivative of f(x1, x2) with respect to x2 at (" << x1 <<", " << x2+lam <<") is: " << dfdx2(x1, x2+lam) << endl;
+            } else { // This is the case where we are closer to the minimum but did not pass it.
+                    lam = lam + x2;
+                    x2 = lam;
+                    cout << "Closer to the min. Lam: " << lam << " x2: " << x2 << endl;
+            }}
         iteration ++;
     }
     cout << "dfdx2 is less than our tolerance at our current point. The final x2 value is " << x2 << endl;

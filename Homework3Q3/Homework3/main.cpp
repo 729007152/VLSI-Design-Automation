@@ -46,7 +46,7 @@ void dijkstra(int** edges, int numNodes){
         int closestNode = shortestNodeSearch(distance, visited, numNodes);
         visited[closestNode] = true;
         for(int currentNode=0; currentNode<numNodes; currentNode++){
-            if(edges[closestNode][currentNode] != 0 && !visited[currentNode]){ //Checks to see if there exist a shared edge between node 'i' and node 'j' and checks if node j was ever traversed
+            if(edges[closestNode][currentNode] != 0 && !visited[currentNode]){ //Checks to see if there exist a shared edge between the first node and node and our current node and checks if the currnet node was ever traversed
                 int dist = distance[closestNode] + edges[closestNode][currentNode];
                 if(dist < distance[currentNode]){ // Is the current node on a closer path?
                     distance[currentNode] = dist;
