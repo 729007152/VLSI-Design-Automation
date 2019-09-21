@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1569015743 source:c:\school\gradschool\vlsi design automation\homework\vlsi-design-automation\homework4q3\homework4\main.cpp
+	<iostream>
+	<cmath>
+	<math.h>
+	<stdlib.h>
+
